@@ -8,4 +8,7 @@ psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f prepare.sql
 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "\copy auth.users (id, email, encrypted_password, email_confirmed_at, raw_user_meta_data, created_at) from 'users.csv' csv header"
 pg_restore --clean --if-exists --no-owner --no-acl --exit-on-error --dbname "$DATABASE_URL" app.dump
 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -v old_prefix="$OLD_STORAGE_PREFIX" -v new_prefix="$NEW_STORAGE_PREFIX" -f urls.sql
+# Keeps the Supabase policies working for an app that switches to the
+# authenticated role (after/lib/db.ts). Drop this line if you don't.
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f rls-grants.sql
 psql "$DATABASE_URL" -f verify.sql
