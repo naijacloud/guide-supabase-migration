@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { seeOther } from '../../../lib/redirect';
 import { asUser } from '../../../lib/db';
 import { currentUserId } from '../../../lib/session';
 
@@ -9,5 +10,5 @@ export async function POST(req: Request) {
   if (!userId) return NextResponse.json({ error: 'sign in first' }, { status: 401 });
   const title = String((await req.formData()).get('title') ?? '').trim();
   if (title) await asUser(userId, (db) => db.query('insert into notes (title) values ($1)', [title]));
-  return NextResponse.redirect(new URL('/', req.url), 303);
+  return seeOther('/');
 }

@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { NextResponse } from 'next/server';
+import { seeOther } from '../../../lib/redirect';
 import { pool } from '../../../lib/db';
 import { createSession } from '../../../lib/session';
 
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   );
   const user = rows[0];
   const ok = user?.encrypted_password ? await bcrypt.compare(password, user.encrypted_password) : false;
-  if (!ok) return NextResponse.redirect(new URL('/?error=1', req.url), 303);
+  if (!ok) return seeOther('/?error=1');
   await createSession(user.id);
-  return NextResponse.redirect(new URL('/', req.url), 303);
+  return seeOther('/');
 }
